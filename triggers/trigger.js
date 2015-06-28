@@ -1,6 +1,6 @@
 'use strict';
 
-var Errors = require('./errors');
+var Errors = require('../lib/errors');
 
 function Trigger(matcher) {
   if (!matcher || typeof matcher !== 'function') {

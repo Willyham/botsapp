@@ -55,8 +55,9 @@ function Bot(options) {
     'receivedAudio',
     'receivedVcard'
   ];
+  var dispatch = this.dispatcher.dispatchEvent.bind(this.dispatcher);
   this._events.forEach(function register(event) {
-    self.adapter.on(event, self.dispatcher.dispatchEvent);
+    self.adapter.on(event, dispatch);
   });
 }
 
@@ -93,8 +94,9 @@ Bot.prototype.registerAction = function registerAction(trigger, action, context)
 
 Bot.prototype.destroy = function destroy() {
   var self = this;
+  var dispatch = this.dispatcher.dispatchEvent.bind(this.dispatcher);
   this._events.forEach(function register(event) {
-    self.adapter.off(event, self.dispatcher.dispatchEvent);
+    self.adapter.off(event, dispatch);
   });
   this.adapter.sendIsOffline();
   this.adapter.disconnect();

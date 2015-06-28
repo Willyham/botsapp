@@ -2,7 +2,7 @@
 
 var Bot = require('./bot');
 
-var TextTrigger = require('./triggers/MessageTrigger');
+var TextTrigger = require('./triggers/TextTrigger');
 
 module.exports = {
   Bot: Bot,
