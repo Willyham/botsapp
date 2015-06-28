@@ -5,14 +5,14 @@ Botsapp is simple framework for creating WhatsApp bots (using the awesome [whats
 
 ## Disclaimer
 
-I know. I'm sorry. I really hope this doesn't end up powering lots of annoying WhatsApp bots, but I needed this for a personal project. 
+I know. I'm sorry. I really hope this doesn't end up powering lots of annoying WhatsApp bots, but I needed this for a personal project.
 
 Be warned that there are plenty of reports of people getting their number banned from WhatsApp when using anything other than the official clients. *Using this code may result in your account being banned*. The bot will attempt to follow the protocol as closely as possible to avoid that, but this is based on annecdotal evidence rather than watching network traffic (as that is against the WhatsApp terms and conditions).
 
 ## Install
 
 `npm install --save botsapp`
-  
+
 ## Usage
 
 ```js
@@ -31,7 +31,7 @@ var yourBot = new Botsapp.Bot({
 
 var testTrigger = new Botsapp.Triggers.TextTrigger('Hello');
 
-yourBot.registerAction(testTrigger, function onTrigger(event) {
+yourBot.registerTrigger(testTrigger, function onTrigger(event) {
   console.log('Received matching message', event);
 });
 

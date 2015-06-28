@@ -2,11 +2,13 @@
 
 var util = require('util');
 var EventEmitter = require('events').EventEmitter;
+var timers = require('timers');
 
 var whatsapi = require('whatsapi');
 
 var Dispatcher = require('./lib/dispatcher');
 var Errors = require('./lib/errors');
+var createDelay = require('./lib/type-delay');
 
 /**
  * Create an instance of a Bot
@@ -107,22 +109,34 @@ Bot.prototype.connect = function connect(callback) {
 /**
  * Register an action for the bot
  * @param {Trigger} trigger The trigger to listen for
- * @param {Function} action The action to run when the trigger matches
+ * @param {Function} handler The function to run when the trigger matches
  * @param {Object} context Context to call the action with
  */
-Bot.prototype.registerAction = function registerAction(trigger, action, context) {
-  this.dispatcher.registerAction(trigger, action, context);
+Bot.prototype.registerTrigger = function registerTrigger(trigger, handler, context) {
+  this.dispatcher.registerTrigger(trigger, handler, context);
+};
+
+/**
+ * Send a message with a delay.
+ * Also set the typing state to imitate a real client
+ * @param {String} recipient The recipient's id
+ * @param {String} text The text to send
+ * @param {Function} callback called when sent.
+ */
+Bot.prototype.sendMessage = function sendMessage(recipient, text, callback) {
+  var self = this;
+  this.adapter.sendComposingState(recipient);
+  timers.setTimeout(function send() {
+    self.adapter.sendPausedState(recipient);
+    self.adapter.sendMessage(recipient, text, callback);
+  }, createDelay(text));
 };
 
 /**
  * Destroy and cleanup the bot
  */
 Bot.prototype.destroy = function destroy() {
-  var self = this;
-  var dispatch = this.dispatcher.dispatchEvent.bind(this.dispatcher);
-  this._events.forEach(function register(event) {
-    self.adapter.off(event, dispatch);
-  });
+  this._events.forEach(this.adapter.removeAllListeners);
   this.adapter.sendIsOffline();
   this.adapter.disconnect();
 };
