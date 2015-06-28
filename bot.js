@@ -8,6 +8,16 @@ var whatsapi = require('whatsapi');
 var Dispatcher = require('./lib/dispatcher');
 var Errors = require('./lib/errors');
 
+/**
+ * Create an instance of a Bot
+ * @param {Object} options
+ * @param {Object} options.adapter whatsapi adapter options
+ * @param {String} options.adapter.msisdn msisdn number
+ * @param {String} options.adapter.password password
+ * @param {String} options.adapter.ccode country code
+ * @param {String} [options.adapter.username] Whatsapp username
+ * @constructor
+ */
 function Bot(options) {
   var self = this;
   options = options || {};
@@ -63,6 +73,12 @@ function Bot(options) {
 
 util.inherits(Bot, EventEmitter);
 
+/**
+ * Connect the bot to whatsapp servers
+ * This function will connect, login, get server properties and set the online status
+ * This attempts to mimic the official clients as closely as possible
+ * @param {Function} callback function which is called when connected
+ */
 Bot.prototype.connect = function connect(callback) {
   var self = this;
 
@@ -88,10 +104,19 @@ Bot.prototype.connect = function connect(callback) {
   });
 };
 
+/**
+ * Register an action for the bot
+ * @param {Trigger} trigger The trigger to listen for
+ * @param {Function} action The action to run when the trigger matches
+ * @param {Object} context Context to call the action with
+ */
 Bot.prototype.registerAction = function registerAction(trigger, action, context) {
   this.dispatcher.registerAction(trigger, action, context);
 };
 
+/**
+ * Destroy and cleanup the bot
+ */
 Bot.prototype.destroy = function destroy() {
   var self = this;
   var dispatch = this.dispatcher.dispatchEvent.bind(this.dispatcher);
