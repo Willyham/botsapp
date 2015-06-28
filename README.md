@@ -94,11 +94,12 @@ var helloInGroup = new Trigger()
  .inGroup()
 ```
 
-TODO: 
+TODO:
 - [ ] Groups (join, leave, edit, invite, promote, demote, info)
 - [ ] Send pictures, videos, vcards, locations
 - [ ] Sync contacts (to avoid bans)
 - [ ] Capture group notifications (joins/leaves/edits)
+- [ ] Unit tests!
 
 Note: Many of these thigs can be done directly with `whatsapi` on `bot.adapter`.
 
