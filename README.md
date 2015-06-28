@@ -71,9 +71,20 @@ yourBot.on('error', function gracefulShutdown() {
 
 ## API
 
-There are two exports; `Bot` and `Trigger`. Make an isntance of Bot to establish a connection.
+There are a few exports:
+
+- `Bot`
+- `Trigger`
+- `Dispatcher`
+- `DrainDisptacher`
+
+#### Bot
+
+Make an instance of Bot to establish a connection.
 The bot provides methods to register actions and to interact with WhatsApp. Currently, only
 sending a message (to a user or group) is supported.
+
+#### Trigger
 
 Triggers are sets of conditions which trigger functions when all (default) or any of those conditions are met.
 Triggers can be arbitrarily constructed with a chain.
@@ -94,7 +105,25 @@ var helloInGroup = new Trigger()
  .inGroup()
 ```
 
-TODO:
+#### Dispatcher (+ DrainDispatcher)
+
+The `Dispatcher` is used to dispatch events from WhatsApp, check if they match triggers and invoke actions. By default
+the `Dispatcher` class will dispatch every event from the server to the triggers.
+
+When the bot logs in, you will automatically be dispatched any events which happened when the bot was offline. If you'd
+like to ignore all those events and only process going forwards, you should use the `DrainDispatcher`:
+
+```js
+var beanBot = new Botsapp.Bot({
+  dispatcher: new Botsapp.DrainDispatcher(),
+  adapter: {
+    ...
+  }
+});
+```
+
+#### TODO
+
 - [ ] Groups (join, leave, edit, invite, promote, demote, info)
 - [ ] Send pictures, videos, vcards, locations
 - [ ] Sync contacts (to avoid bans)
