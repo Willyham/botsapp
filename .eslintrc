@@ -1,0 +1,6 @@
+{
+  "rules": {
+    "max-len": [1, 120],
+    "max-statements": [2, 41]
+  }
+}
