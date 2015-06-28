@@ -32,7 +32,7 @@ var yourBot = new Botsapp.Bot({
 
 // Register a handler which logs every message
 var anyMessage = new Botsapp.Trigger().always();
-beanBot.registerTrigger(anyMessage, function onTrigger(event) {
+yourBot.registerTrigger(anyMessage, function onTrigger(event) {
   console.log(event);
 });
 
@@ -54,17 +54,17 @@ var helloFromMe = new Botsapp.Trigger()
   .from(author)
   .withText('hello');
 
-beanBot.registerTrigger(helloFromMe, function onTrigger(event) {
+yourBot.registerTrigger(helloFromMe, function onTrigger(event) {
   console.log('Got hello from', author, event.body);
 });
 
 // Connect to the server
-beanBot.connect(function() {
+yourBot.connect(function() {
   console.log("I'm alive!");
 });
 
-beanBot.on('error', function gracefulShutdown() {
-  beanBot.destroy();
+yourBot.on('error', function gracefulShutdown() {
+  yourBot.destroy();
   process.exit(1);
 });
 ```
@@ -93,6 +93,14 @@ var helloInGroup = new Trigger()
  .withText('hello')
  .inGroup()
 ```
+
+TODO: 
+- [ ] Groups (join, leave, edit, invite, promote, demote, info)
+- [ ] Send pictures, videos, vcards, locations
+- [ ] Sync contacts (to avoid bans)
+- [ ] Capture group notifications (joins/leaves/edits)
+
+Note: Many of these thigs can be done directly with `whatsapi` on `bot.adapter`.
 
 Full API description:
 
