@@ -57,7 +57,7 @@ function Bot(options) {
   this.serverProperties = {};
 
   // Add listeners
-  this.dispatcher = new Dispatcher();
+  this.dispatcher = options.dispatcher || new Dispatcher();
 
   this._events = [
     'receivedMessage',

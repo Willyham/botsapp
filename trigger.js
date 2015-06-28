@@ -28,7 +28,7 @@ function Trigger(options) {
     throw Errors.InvalidArgumentError({
       argument: 'options.mode',
       given: options.mode,
-      expected: 'One of: '+ _.values(JOIN_MODES)
+      expected: 'One of: ' + _.values(JOIN_MODES)
     });
   }
   this.conditions = [];
@@ -39,8 +39,8 @@ function Trigger(options) {
  * Useful if you want to capture everything
  * @constructor
  */
-Trigger.prototype.always = function() {
-  var predicate = function() {
+Trigger.prototype.always = function always() {
+  var predicate = function matcher() {
     return true;
   };
   this.conditions.push(predicate);
@@ -61,7 +61,7 @@ Trigger.prototype.withText = function matchingText(text, options) {
     caseSensitive: false
   }, options);
 
-  var predicate = function(event) {
+  var predicate = function matcher(event) {
     if (!event.body) {
       return false;
     }
@@ -82,7 +82,7 @@ Trigger.prototype.withEmoji = function containingEmoji(emoji) {
       expected: 'buffer'
     });
   }
-  var predicate = function(event) {
+  var predicate = function matcher(event) {
     if (!event.body) {
       return false;
     }
@@ -99,8 +99,8 @@ Trigger.prototype.withEmoji = function containingEmoji(emoji) {
  * @returns {Trigger} this object for chaining
  */
 Trigger.prototype.from = function from(author) {
-  var predicate = function(event) {
-    if(event.author) {
+  var predicate = function matcher(event) {
+    if (event.author) {
       return event.author === author;
     }
     return event.from === author;
@@ -155,7 +155,7 @@ Trigger.prototype.matches = function matches(event) {
     return predicate(event);
   }
   if (this.options.mode === JOIN_MODES.ALL) {
-    return _.all(this.conditions, isMatch)
+    return _.all(this.conditions, isMatch);
   }
   return _.any(this.conditions, isMatch);
 };
