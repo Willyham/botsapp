@@ -5,7 +5,7 @@ var EventEmitter = require('events').EventEmitter;
 
 var whatsapi = require('whatsapi');
 
-var Errors = require('./errors');
+var Errors = require('./lib/errors');
 
 function Bot(options) {
   options = options || {};
@@ -37,7 +37,23 @@ function Bot(options) {
   this.adapter.on('error', function reportError(err) {
     self.emit('error', err);
   });
-  this.triggers = [];
+
+  // Setup bot state
+  this.triggers = {
+    message: [],
+    location: [],
+    image: [],
+    audio: [],
+    video: [],
+    vcard: []
+  };
+  this.contacts = [];
+  this.serverProperties = {};
+
+  // Add listeners
+  this.adapter.on('receivedMessage', function(message) {
+    console.log(message.body);
+  });
 }
 
 util.inherits(Bot, EventEmitter);
@@ -50,6 +66,10 @@ Bot.prototype.connect = function connect(callback) {
       callback(Errors.ConnectionError(err));
       return;
     }
+    // Simulate official clients by requesting properties
+    self.adapter.requestServerProperties(function onProps(props) {
+      self.serverProperties = props;
+    });
     self.adapter.sendIsOnline();
     callback(null);
   }
