@@ -19,6 +19,7 @@ Be warned that there are plenty of reports of people getting their number banned
 'use strict';
 
 var Botsapp = require('botsapp');
+var process = require('process');
 
 var yourBot = new Botsapp.Bot({
   adapter: {
@@ -29,15 +30,91 @@ var yourBot = new Botsapp.Bot({
   }
 });
 
-var testTrigger = new Botsapp.Triggers.TextTrigger('Hello');
-
-yourBot.registerTrigger(testTrigger, function onTrigger(event) {
-  console.log('Received matching message', event);
+// Register a handler which logs every message
+var anyMessage = new Botsapp.Trigger().always();
+beanBot.registerTrigger(anyMessage, function onTrigger(event) {
+  console.log(event);
 });
 
-yourBot.connect(function() {
+// Get a thumbsup, give a thumbsup
+var thumbsupEmoji = new Buffer([240, 159, 145, 141]);
+var thumbsUp = new Botsapp.Trigger().withEmoji(thumbsupEmoji);
+
+yourBot.registerTrigger(thumbsUp, function onTrigger(event) {
+  var emoji = thumbsupEmoji.toString('utf8');
+
+  yourBot.sendMessage(event.from, emoji, function onSend() {
+    console.log('Sent emoji to', event.from);
+  });
+});
+
+// Get hello from a specific user
+var author = '123456789@s.whatsapp.net';
+var helloFromMe = new Botsapp.Trigger()
+  .from(author)
+  .withText('hello');
+
+beanBot.registerTrigger(helloFromMe, function onTrigger(event) {
+  console.log('Got hello from', author, event.body);
+});
+
+// Connect to the server
+beanBot.connect(function() {
   console.log("I'm alive!");
+});
+
+beanBot.on('error', function gracefulShutdown() {
+  beanBot.destroy();
+  process.exit(1);
 });
 ```
 
-This will setup a simple bot which will log any message which contains the string 'hello'.
+## API
+
+There are two exports; `Bot` and `Trigger`. Make an isntance of Bot to establish a connection.
+The bot provides methods to register actions and to interact with WhatsApp. Currently, only
+sending a message (to a user or group) is supported.
+
+Triggers are sets of conditions which trigger functions when all (default) or any of those conditions are met.
+Triggers can be arbitrarily constructed with a chain.
+
+Matching any conditions:
+
+```js
+var someWords = new Trigger({
+ mode: 'any',
+}).withText('foo').withText('bar')
+```
+
+Matching all conditions:
+
+```js
+var helloInGroup = new Trigger()
+ .withText('hello')
+ .inGroup()
+```
+
+Full API description:
+
+```ocaml
+
+Bot(options: Object) => {
+  connect: (callback: Function) => void,
+  destroy: () => void,
+  registerTrigger: (trigger: Trigger, handler: Function, callback: Function) => void,
+  sendMessage: (recipient: String, text: String, callback: Function) => void,
+}
+
+Trigger(options: Object) => {
+  matches: (event: Object) => Boolean,
+  always: () => Trigger,
+  withText: (text: String, options: Object) => Trigger,
+  withEmoji: (emoji: Buffer) => Trigger,
+  from: (author: String) => Trigger,
+  inGroup: (options: Object) => Trigger,
+  custom: (predicate: (event: Object) => Boolean) => Trigger
+}
+
+```
+
+

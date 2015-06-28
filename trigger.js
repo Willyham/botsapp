@@ -136,6 +136,16 @@ Trigger.prototype.inGroup = function inGroup(options) {
 };
 
 /**
+ * Register a custom predicate
+ * @param {Function} predicate the predicate
+ * @returns {Trigger} this object for chaining
+ */
+Trigger.prototype.custom = function custom(predicate) {
+  this.conditions.push(predicate);
+  return this;
+};
+
+/**
  * Check whether the trigger matches this event by invoking the predecate
  * @param {Object} event Event from whatsapp
  * @returns {Boolean} true if match, false otherwise
