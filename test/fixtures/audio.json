@@ -1,0 +1,20 @@
+{
+  "from": "12345678909@s.whatsapp.net",
+  "id": "0987654321-9",
+  "date": "2015-07-26T13:42:33.000Z",
+  "notify": "Will Demaine",
+  "seconds": 2,
+  "size": 8932,
+  "url": "https://mmi613.whatsapp.net/d/ZiAHjwR-abcd/AmHwym-q64-fk_efgh.aac",
+  "file": "AmHwym-q64-fk_abcd.aac",
+  "origin": "live",
+  "ip": "123.123.123.13",
+  "mimetype": "audio/aac",
+  "filehash": "asdfghjkl=",
+  "duration": 2,
+  "acodec": "aac",
+  "asampfreq": 22050,
+  "abitrate": 33,
+  "author": "",
+  "isGroup": false
+}
