@@ -6,6 +6,7 @@
   "dependencies": {
     "buffertools": "^2.1.2",
     "error": "^7.0.2",
+    "haversine": "^1.0.0",
     "istanbul": "^0.3.17",
     "lodash": "^3.9.3",
     "tape": "^4.0.0",

@@ -4,11 +4,11 @@ var Buffer = require('buffer').Buffer;
 
 var _ = require('lodash');
 var extend = require('xtend');
-var Buffertools = require('buffertools');
 
 var Errors = require('./lib/errors');
 
 var Location = require('./predicates/location');
+var Message = require('./predicates/message');
 
 var JOIN_MODES = {
   ALL: 'all',
@@ -37,9 +37,25 @@ function Trigger(options) {
 }
 
 /**
+ * Check whether the trigger matches this event by invoking the predecate
+ * @param {Object} event Event from whatsapp
+ * @returns {Boolean} true if match, false otherwise
+ */
+Trigger.prototype.matches = function matches(event) {
+  function isMatch(predicate) {
+    return predicate(event);
+  }
+  if (this.options.mode === JOIN_MODES.ALL) {
+    return _.all(this.conditions, isMatch);
+  }
+  return _.any(this.conditions, isMatch);
+};
+
+// Predicate constructors below
+
+/**
  * Create a trigger which always matches an event
  * Useful if you want to capture everything
- * @constructor
  */
 Trigger.prototype.always = function always() {
   var predicate = function matcher() {
@@ -55,27 +71,17 @@ Trigger.prototype.always = function always() {
  * @param {Object} options options
  * @param {Boolean} [options.caseSensitive=false] Match case sensitive, default false
  * @returns {Trigger} this object for chaining
- * @constructor
  */
 Trigger.prototype.withText = function matchingText(text, options) {
-  options = options || {};
-  options = extend({
-    caseSensitive: false
-  }, options);
-
-  var predicate = function matcher(event) {
-    if (!event.body) {
-      return false;
-    }
-    if (!options.caseSensitive) {
-      return event.body.toLowerCase().indexOf(text.toLowerCase()) !== -1;
-    }
-    return event.body.indexOf(text) !== -1;
-  };
-  this.conditions.push(predicate);
+  this.conditions.push(Message.withText(text, options));
   return this;
 };
 
+/**
+ * Create a trigger which matches a regex
+ * @param {RegExp} regex Regex to apply to message
+ * @returns {Trigger} this object for chaining
+ */
 Trigger.prototype.withRegex = function withRegex(regex) {
   if (!(regex instanceof RegExp)) {
     throw Errors.InvalidArgumentError({
@@ -84,16 +90,15 @@ Trigger.prototype.withRegex = function withRegex(regex) {
       expected: 'RegExp'
     });
   }
-  var predicate = function matcher(event) {
-    if (!event.body) {
-      return false;
-    }
-    return regex.test(event.body);
-  };
-  this.conditions.push(predicate);
+  this.conditions.push(Message.withRegex(regex));
   return this;
 };
 
+/**
+ * Create a trigger which matches emoji
+ * @param {Buffer} emoji Emoji as a buffer
+ * @returns {Trigger} this object for chaining
+ */
 Trigger.prototype.withEmoji = function containingEmoji(emoji) {
   if (!Buffer.isBuffer(emoji)) {
     throw Errors.InvalidArgumentError({
@@ -102,14 +107,7 @@ Trigger.prototype.withEmoji = function containingEmoji(emoji) {
       expected: 'buffer'
     });
   }
-  var predicate = function matcher(event) {
-    if (!event.body) {
-      return false;
-    }
-    var bodyBuffer = new Buffer(event.body);
-    return Boolean(Buffertools.indexOf(bodyBuffer, emoji) !== -1);
-  };
-  this.conditions.push(predicate);
+  this.conditions.push(Message.withEmoji(emoji));
   return this;
 };
 
@@ -166,27 +164,23 @@ Trigger.prototype.custom = function custom(predicate) {
 };
 
 /**
- * Check whether the trigger matches this event by invoking the predecate
- * @param {Object} event Event from whatsapp
- * @returns {Boolean} true if match, false otherwise
+ * Check that a message is a location
+ * @returns {Trigger} this object for chaining
  */
-Trigger.prototype.matches = function matches(event) {
-  function isMatch(predicate) {
-    return predicate(event);
-  }
-  if (this.options.mode === JOIN_MODES.ALL) {
-    return _.all(this.conditions, isMatch);
-  }
-  return _.any(this.conditions, isMatch);
-};
-
 Trigger.prototype.isLocation = function isLocation() {
   this.conditions.push(Location.isLocation);
   return this;
 };
 
-Trigger.prototype.withinDistanceOf = function withinDistanceOf(point, distance) {
-  this.conditions.push(Location.withinDistance(point, distance));
+/**
+ * Check that a location message is within a distance of
+ * @param {{latitude: number, longitude: number}} point Point to check
+ * @param {Number} distanceLimit limit
+ * @param {String} [unit] distance unit, 'km' (default) or 'mile'
+ * @returns {Trigger} this object for chaining
+ */
+Trigger.prototype.withinDistanceOf = function withinDistanceOf(point, distanceLimit, unit) {
+  this.conditions.push(Location.withinDistance(point, distanceLimit, unit));
   return this;
 };
 
