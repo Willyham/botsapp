@@ -8,6 +8,8 @@ var Buffertools = require('buffertools');
 
 var Errors = require('./lib/errors');
 
+var Location = require('./predicates/location');
+
 var JOIN_MODES = {
   ALL: 'all',
   ANY: 'any'
@@ -69,6 +71,24 @@ Trigger.prototype.withText = function matchingText(text, options) {
       return event.body.toLowerCase().indexOf(text.toLowerCase()) !== -1;
     }
     return event.body.indexOf(text) !== -1;
+  };
+  this.conditions.push(predicate);
+  return this;
+};
+
+Trigger.prototype.withRegex = function withRegex(regex) {
+  if (!(regex instanceof RegExp)) {
+    throw Errors.InvalidArgumentError({
+      argument: 'regex',
+      given: regex,
+      expected: 'RegExp'
+    });
+  }
+  var predicate = function matcher(event) {
+    if (!event.body) {
+      return false;
+    }
+    return regex.test(event.body);
   };
   this.conditions.push(predicate);
   return this;
@@ -158,6 +178,16 @@ Trigger.prototype.matches = function matches(event) {
     return _.all(this.conditions, isMatch);
   }
   return _.any(this.conditions, isMatch);
+};
+
+Trigger.prototype.isLocation = function isLocation() {
+  this.conditions.push(Location.isLocation);
+  return this;
+};
+
+Trigger.prototype.withinDistanceOf = function withinDistanceOf(point, distance) {
+  this.conditions.push(Location.withinDistance(point, distance));
+  return this;
 };
 
 module.exports = Trigger;
