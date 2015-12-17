@@ -5,7 +5,7 @@ var Trigger = require('./trigger');
 var Dispatcher = require('./lib/dispatcher');
 var DrainDispatcher = require('./lib/drain-dispatcher');
 
-// Comment doo
+// Comment foo2
 module.exports = {
   Bot: Bot,
   Trigger: Trigger,
