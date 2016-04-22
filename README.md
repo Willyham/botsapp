@@ -3,6 +3,10 @@ A WhatsApp bot framework in Node
 
 Botsapp is simple framework for creating WhatsApp bots (using the awesome [whatsapi](https://github.com/hidespb/node-whatsapi) project).
 
+## whatapi
+
+As of May 2015 the whatsapi library which is a dependecy of botsapp has been removed due to legal threats.. I belive there are other forks possibly still available. I'm no longer actively using this library, but I'm happy to accept pull requests for anyone who wishes to test one of these libraries and change the dependency.
+
 ## Disclaimer
 
 I know. I'm sorry. I really hope this doesn't end up powering lots of annoying WhatsApp bots, but I needed this for a personal project.
